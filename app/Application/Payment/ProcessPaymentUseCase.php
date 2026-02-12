@@ -13,11 +13,14 @@ final class ProcessPaymentUseCase
         private OutboxRepository $outboxRepository
     ) {}
 
-    public function execute(float $amount): void
+    public function execute(float $amount): string
     {
-        DB::transaction(function () use ($amount) {
+        return DB::transaction(function () use ($amount) {
 
-            $payment = Payment::create(Str::uuid()->toString(), $amount);
+            $paymentId = (string) \Str::uuid();
+
+            $payment = Payment::create($paymentId, $amount);
+
             $payment->markAsSuccess();
 
             $this->paymentRepository->save($payment);
@@ -28,9 +31,11 @@ final class ProcessPaymentUseCase
                 'PaymentSucceeded',
                 [
                     'payment_id' => $payment->id(),
-                    'amount' => $payment->amount()
+                    'amount' => $payment->amount(),
                 ]
             );
+
+            return $payment->id();
         });
     }
 }
