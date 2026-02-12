@@ -15,6 +15,7 @@ class StorePaymentRequest extends FormRequest
     {
         return [
             'amount' => ['required', 'numeric', 'min:1'],
+            'email' => ['required', 'email'],
         ];
-    }
+    }    
 }

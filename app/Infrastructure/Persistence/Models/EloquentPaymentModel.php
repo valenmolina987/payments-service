@@ -15,5 +15,6 @@ class EloquentPaymentModel extends Model
         'id',
         'amount',
         'status',
+        'email'
     ];
 }

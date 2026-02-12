@@ -9,7 +9,7 @@ use App\Application\Payment\OutboxRepository;
 use App\Infrastructure\Persistence\Repositories\EloquentPaymentRepository;
 use App\Infrastructure\Persistence\Repositories\EloquentOutboxRepository;
 use App\Application\Payment\NotificationService;
-use App\Infrastructure\Services\FakeNotificationService;
+use App\Infrastructure\Services\MailNotificationService;
 use App\Application\Payment\ListPaymentsQuery;
 use App\Infrastructure\Persistence\Queries\EloquentListPaymentsQuery;
 
@@ -32,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(
             NotificationService::class,
-            FakeNotificationService::class
+            MailNotificationService::class
         );
 
         $this->app->bind(

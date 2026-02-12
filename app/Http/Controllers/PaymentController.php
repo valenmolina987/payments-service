@@ -16,8 +16,9 @@ class PaymentController extends Controller
     public function store(StorePaymentRequest $request): JsonResponse
     {
         $paymentId = $this->useCase->execute(
-            amount: (float) $request->input('amount')
-        );
+            amount: (float) $request->input('amount'),
+            email: $request->input('email')
+        );        
 
         return response()->json([
             'payment_id' => $paymentId,

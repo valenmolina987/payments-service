@@ -53,6 +53,15 @@ services:
     networks:
       - payments_network
 
+  mailpit:
+    image: axllent/mailpit
+    container_name: payments_mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - payments_network
+      
   worker:
     build:
       context: .

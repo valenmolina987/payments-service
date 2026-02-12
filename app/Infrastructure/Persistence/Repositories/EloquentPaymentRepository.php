@@ -16,7 +16,8 @@ class EloquentPaymentRepository implements PaymentRepository
             [
                 'amount' => $payment->amount(),
                 'status' => $payment->status()->value(),
+                'email' => $payment->email(),
             ]
-        );
+        );        
     }
 }

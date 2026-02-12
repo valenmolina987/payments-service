@@ -37,6 +37,8 @@ class ProcessOutboxMessagesJob implements ShouldQueue
 
                 } catch (\Throwable $e) {
 
+                    Log::error($e->getMessage());
+
                     $currentAttempts = $message->attempts + 1;
                 
                     Log::info('Intentos', [$currentAttempts]);
