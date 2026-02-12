@@ -30,7 +30,14 @@ app/
 ├── Http/
 └── Mail/
 
+
 ## Domain
+
+Contiene la lógica de negocio pura:
+
+- Entidad `Payment`
+- Estados del pago
+- Reglas del dominio
 
 Esta capa no conoce nada sobre base de datos, colas o framework.
 
@@ -38,11 +45,25 @@ Esta capa no conoce nada sobre base de datos, colas o framework.
 
 ## Application
 
+Contiene:
+
+- Casos de uso (`ProcessPaymentUseCase`)
+- Interfaces (`PaymentRepository`, `OutboxRepository`, `NotificationService`)
+- Orquestación transaccional
+
 Aquí se define el comportamiento del sistema sin depender de implementaciones concretas.
 
 ---
 
 ## Infrastructure
+
+Contiene:
+
+- Implementaciones Eloquent
+- Jobs de procesamiento de cola
+- Servicio de envío de correos
+- Integración con Redis
+- Modelos de persistencia
 
 Es la capa donde viven los detalles técnicos.
 
@@ -59,9 +80,10 @@ El caso de uso `ProcessPaymentUseCase` ejecuta:
 - Persistencia en base de datos
 - Registro del evento en la tabla outbox
 
-Todo esto ocurre dentro de una transacción de base de datos:
+Todo esto ocurre dentro de una transacción:
 
 DB::transaction(...)
+
 
 Esto garantiza atomicidad:
 
@@ -155,50 +177,124 @@ Servicios incluidos:
 - Worker
 - Scheduler
 
+El proyecto está completamente dockerizado y no requiere instalaciones locales de PHP, MySQL o Redis.
+
 ---
 
 # Instalación y Ejecución
 
-## 1. Construir contenedores
+## Requisitos
+
+- Docker
+- Docker Compose
+
+---
+
+## 1. Clonar repositorio
+
+git clone https://github.com/valenmolina987/payments-service.git
+cd payments-service
+
+---
+
+## 2. Crear archivo de entorno
+
+El archivo `.env` no se incluye por seguridad.
+
+Crear a partir del ejemplo:
+
+cp .env.example .env
+
+
+Si no existe `.env.example`, crear manualmente un archivo `.env` con el siguiente contenido mínimo:
+
+APP_NAME=Laravel
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=payments
+DB_USERNAME=user
+DB_PASSWORD=password
+
+QUEUE_CONNECTION=redis
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS=hello@example.com
+MAIL_FROM_NAME=Laravel
+
+
+---
+
+## 3. Levantar contenedores
 
 docker compose up -d --build
 
 
 ---
 
-## 2. Instalar dependencias
+## 4. Instalar dependencias
 
 docker compose exec app composer install
 
+
 ---
 
-## 3. Ejecutar migraciones
+## 5. Generar clave de aplicación
+
+docker compose exec app php artisan key:generate
+
+
+---
+
+## 6. Ejecutar migraciones
 
 docker compose exec app php artisan migrate
 
+
 ---
 
-# Mailpit
+# Acceso
 
-Mailpit se usa como servidor SMTP local para pruebas.
+Aplicación:
+http://localhost:8000
 
-Configuración:
+Crear Pago:
+Post: http://localhost:8000/api/payments
 
-MAIL_HOST=mailpit
-MAIL_PORT=1025
+Body:
+{
+  "amount": 150,
+  "email": "valen@test.com"
+}
 
+Consultar estado de pagos y notificaciones:
+Get: http://localhost:8000/api/payments
 
-Para visualizar los correos enviados:
+Para ver el correo enviado ingrese a:
 
+Mailpit:
 http://localhost:8025
-
 
 # Conclusión
 
 El sistema demuestra:
 
 - Manejo correcto de transacciones.
-- Consistencia eventual.
-- Procesamiento asíncrono real.
-- Control robusto de reintentos.
+- Consistencia eventual mediante Transactional Outbox.
+- Procesamiento asíncrono con Redis.
+- Control manual robusto de reintentos.
 - Separación clara entre dominio e infraestructura.
+- Entorno reproducible mediante Docker.
