@@ -266,6 +266,15 @@ docker compose exec app php artisan migrate
 
 ---
 
+## 7. Reiniciar worker y scheduler
+
+docker compose restart scheduler
+
+docker compose restart worker
+
+
+---
+
 # Acceso
 
 Aplicación:
