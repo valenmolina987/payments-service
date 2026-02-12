@@ -19,6 +19,9 @@ return new class extends Migration
             $table->json('payload');
             $table->integer('attempts')->default(0);
             $table->timestamp('processed_at')->nullable();
+            $table->boolean('failed')->default(false);
+            $table->timestamp('failed_at')->nullable();
+            $table->text('error_message')->nullable();
             $table->timestamps();
         });        
     }

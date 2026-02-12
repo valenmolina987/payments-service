@@ -59,7 +59,7 @@ services:
       dockerfile: docker/php/Dockerfile
     container_name: payments_worker
     working_dir: /var/www
-    command: php artisan queue:work --tries=5 --backoff=10
+    command: php artisan queue:work redis --sleep=1 --tries=1 --timeout=60
     volumes:
       - .:/var/www
     depends_on:

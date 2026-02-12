@@ -19,6 +19,9 @@ class EloquentOutboxMessageModel extends Model
         'payload',
         'attempts',
         'processed_at',
+        'failed',
+        'failed_at',
+        'error_message',
     ];
 
     protected $casts = [
